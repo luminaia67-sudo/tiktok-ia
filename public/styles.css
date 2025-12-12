@@ -1,8 +1,6 @@
 /* ============================================
    BOOMINUM ⚡ - styles.css (Versão definitiva)
-   - Atualizado para modelos GROQ
-   - Tema mais profissional
-   - Aparência premium compatível com HTML + script.js
+   Otimizado para modelos GROQ
 ============================================ */
 
 /* =========================
@@ -26,15 +24,17 @@
   --text: #0f1724;
   --overlay: rgba(0,0,0,0.45);
 
-  /* NOVO: cores específicas para os modelos GROQ */
+  /* CORES ESPECÍFICAS PARA MODELOS GROQ */
   --llama70: #4f78ff;
   --llama11: #5cc9ff;
   --mixtral: #ff934f;
+
+  /* Badges premium (opcional) */
+  --badge-bg: #eef4ff;
+  --badge-text: #2d3e66;
 }
 
-/* =========================
-   DARK MODE
-   ========================= */
+/* ========================= DARK MODE ========================= */
 body.dark {
   --bg: #0b0d0f;
   --bg-2: #0f1113;
@@ -157,10 +157,12 @@ body.dark header {
   margin-top:20px;
 }
 
-/* GRUPO DE MODELOS (NOVO — estilo premium GROQ) */
+/* SELECT MODELS — EFEITO PREMIUM */
 #model-select {
   border-left:4px solid var(--accent);
   font-weight:700;
+  background:white;
+  cursor:pointer;
 }
 
 /* cores específicas */

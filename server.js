@@ -1,14 +1,14 @@
 // ============================================================
-// BOOMINUM SERVER - VERSÃO FINAL 2025 (CORRIGIDA)
+// BOOMINUM SERVER - VERSÃO FINAL 2025 (CORRIGIDA DEFINITIVA)
 // GROQ + Supabase + Limite diário + Compatível com script.js
 // ============================================================
 
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const { createClient } = require("@supabase/supabase-js");
-const Groq = require("groq-sdk");
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import { createClient } from "@supabase/supabase-js";
+import Groq from "groq-sdk";
 
 // ------------------------------------------------------------
 // EXPRESS
@@ -22,39 +22,27 @@ const PORT = process.env.PORT || 3000;
 // ------------------------------------------------------------
 // SUPABASE
 // ------------------------------------------------------------
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error("❌ ERRO: SUPABASE_URL ou SUPABASE_ANON_KEY ausentes no .env");
-}
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// Limite diário gratuito
 const FREE_LIMIT = parseInt(process.env.FREE_LIMIT || "5", 10);
 
 // ------------------------------------------------------------
-// GROQ
+// GROQ SDK (VERSÃO ATUAL 2025)
 // ------------------------------------------------------------
-const groqApiKey = process.env.GROQ_API_KEY;
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY
+});
 
-if (!groqApiKey) {
-  console.error("❌ ERRO: GROQ_API_KEY não definida no .env");
-}
-
-const groq = new Groq({ apiKey: groqApiKey });
-
-// ------------------------------------------------------------
-// MODELOS REAIS SUPORTADOS PELO FRONT + GROQ
-// ------------------------------------------------------------
+// Modelos suportados
 const AVAILABLE_MODELS = [
   "llama-3.2-70b-text",
   "llama-3.2-11b-text",
   "mixtral-8x7b-32768"
 ];
 
-// Modelo padrão do sistema
 const DEFAULT_MODEL = "llama-3.2-70b-text";
 
 // ------------------------------------------------------------
@@ -63,7 +51,7 @@ const DEFAULT_MODEL = "llama-3.2-70b-text";
 app.post("/api/generate", async (req, res) => {
   const { prompt, model, userId } = req.body;
 
-  console.log("\n📩 Recebido do front:", req.body);
+  console.log("\n📩 REQUEST FRONT-END:", req.body);
 
   try {
     if (!prompt || prompt.trim() === "") {
@@ -71,22 +59,20 @@ app.post("/api/generate", async (req, res) => {
     }
 
     // --------------------------------------------------------
-    // 1. Limite diário por usuário
+    // 1. LIMITE DIÁRIO DO USUÁRIO
     // --------------------------------------------------------
     if (userId) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+      const tomorrow = new Date(today.getTime() + 86400000);
 
-      const { count, error: countError } = await supabase
+      const { count } = await supabase
         .from("scripts")
         .select("id", { count: "exact" })
         .eq("user_id", userId)
         .gte("created_at", today.toISOString())
         .lt("created_at", tomorrow.toISOString());
-
-      if (countError) throw countError;
 
       if (count >= FREE_LIMIT) {
         return res.status(403).json({
@@ -97,15 +83,15 @@ app.post("/api/generate", async (req, res) => {
     }
 
     // --------------------------------------------------------
-    // 2. Validar modelo enviado pelo script.js
+    // 2. VALIDAR MODELO
     // --------------------------------------------------------
     const selectedModel =
       AVAILABLE_MODELS.includes(model) ? model : DEFAULT_MODEL;
 
-    console.log(`🤖 Usando modelo: ${selectedModel}`);
+    console.log("🤖 Modelo escolhido:", selectedModel);
 
     // --------------------------------------------------------
-    // 3. CHAMAR GROQ
+    // 3. GERAR ROTEIRO COM GROQ (SDK NOVO)
     // --------------------------------------------------------
     const completion = await groq.chat.completions.create({
       model: selectedModel,
@@ -113,12 +99,9 @@ app.post("/api/generate", async (req, res) => {
         {
           role: "system",
           content:
-            "Você gera roteiros profissionais, curtos, criativos e virais para vídeos curtos."
+            "Você gera roteiros profissionais, curtos, criativos e virais para vídeos."
         },
-        {
-          role: "user",
-          content: prompt
-        }
+        { role: "user", content: prompt }
       ],
       temperature: 0.7,
       max_tokens: 900
@@ -128,7 +111,7 @@ app.post("/api/generate", async (req, res) => {
       completion?.choices?.[0]?.message?.content ||
       "Erro: resposta vazia da IA.";
 
-    console.log("✅ Roteiro gerado.");
+    console.log("✅ Roteiro gerado com sucesso!");
 
     // --------------------------------------------------------
     // 4. SALVAR NO SUPABASE
@@ -145,27 +128,26 @@ app.post("/api/generate", async (req, res) => {
     }
 
     // --------------------------------------------------------
-    // 5. RETORNAR RESPOSTA AO FRONT
+    // 5. ENVIAR PARA O FRONT
     // --------------------------------------------------------
-    return res.json({
+    res.json({
       success: true,
       model: selectedModel,
       result: generatedText
     });
-
   } catch (err) {
-    console.log("❌ ERRO NO /api/generate:", err);
+    console.error("❌ ERRO NO /api/generate:", err);
 
-    return res.status(500).json({
+    res.status(500).json({
       error: "Erro interno ao gerar roteiro.",
-      details: err.message || String(err)
+      details: err.message
     });
   }
 });
 
 // ------------------------------------------------------------
-// START SERVER
+// INICIAR SERVIDOR
 // ------------------------------------------------------------
 app.listen(PORT, () => {
-  console.log(`🔥 Servidor BOOMINUM rodando na porta ${PORT} (GROQ ATIVO!)`);
+  console.log(`🔥 Servidor BOOMINUM rodando na porta ${PORT}`);
 });
