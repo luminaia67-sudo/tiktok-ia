@@ -1,6 +1,6 @@
 // ============================================================
-// BOOMINUM SERVER - VERSÃO FINAL 2025 (CORRIGIDA DEFINITIVA)
-// GROQ + Supabase + Limite diário + Compatível com script.js
+// BOOMINUM SERVER - VERSÃO FINAL DEFINITIVA (ESTÁVEL)
+// GROQ + Supabase + Modelo FIXO (SEM ERRO)
 // ============================================================
 
 import "dotenv/config";
@@ -30,36 +30,29 @@ const supabase = createClient(
 const FREE_LIMIT = parseInt(process.env.FREE_LIMIT || "5", 10);
 
 // ------------------------------------------------------------
-// GROQ SDK (VERSÃO ATUAL 2025)
+// GROQ — MODELO QUE SUA CONTA REALMENTE TEM
 // ------------------------------------------------------------
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
-// Modelos suportados
-const AVAILABLE_MODELS = [
-  "llama-3.2-70b-text",
-  "llama-3.2-11b-text",
-  "mixtral-8x7b-32768"
-];
-
-const DEFAULT_MODEL = "llama-3.2-70b-text";
+const FIXED_MODEL = "openai/gpt-oss-120b";
 
 // ------------------------------------------------------------
-// ROTA PRINCIPAL /api/generate
+// ROTA PRINCIPAL
 // ------------------------------------------------------------
 app.post("/api/generate", async (req, res) => {
-  const { prompt, model, userId } = req.body;
+  const { prompt, userId } = req.body;
 
-  console.log("\n📩 REQUEST FRONT-END:", req.body);
+  console.log("📩 REQUEST:", { prompt });
 
   try {
-    if (!prompt || prompt.trim() === "") {
+    if (!prompt || !prompt.trim()) {
       return res.status(400).json({ error: "Prompt obrigatório." });
     }
 
     // --------------------------------------------------------
-    // 1. LIMITE DIÁRIO DO USUÁRIO
+    // LIMITE DIÁRIO (OPCIONAL)
     // --------------------------------------------------------
     if (userId) {
       const today = new Date();
@@ -76,45 +69,35 @@ app.post("/api/generate", async (req, res) => {
 
       if (count >= FREE_LIMIT) {
         return res.status(403).json({
-          error: "Limite de geração atingido.",
-          details: `Você já gerou ${FREE_LIMIT} roteiros hoje.`
+          error: "Limite diário atingido."
         });
       }
     }
 
     // --------------------------------------------------------
-    // 2. VALIDAR MODELO
-    // --------------------------------------------------------
-    const selectedModel =
-      AVAILABLE_MODELS.includes(model) ? model : DEFAULT_MODEL;
-
-    console.log("🤖 Modelo escolhido:", selectedModel);
-
-    // --------------------------------------------------------
-    // 3. GERAR ROTEIRO COM GROQ (SDK NOVO)
+    // CHAMADA GROQ (MODELO FIXO)
     // --------------------------------------------------------
     const completion = await groq.chat.completions.create({
-      model: selectedModel,
+      model: FIXED_MODEL,
       messages: [
         {
           role: "system",
           content:
-            "Você gera roteiros profissionais, curtos, criativos e virais para vídeos."
+            "Você cria roteiros curtos, profissionais, criativos e virais para vídeos."
         },
-        { role: "user", content: prompt }
-      ],
-      temperature: 0.7,
-      max_tokens: 900
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
     });
 
     const generatedText =
       completion?.choices?.[0]?.message?.content ||
       "Erro: resposta vazia da IA.";
 
-    console.log("✅ Roteiro gerado com sucesso!");
-
     // --------------------------------------------------------
-    // 4. SALVAR NO SUPABASE
+    // SALVAR (SE LOGADO)
     // --------------------------------------------------------
     if (userId) {
       await supabase.from("scripts").insert([
@@ -122,32 +105,28 @@ app.post("/api/generate", async (req, res) => {
           user_id: userId,
           prompt,
           roteiro_final: generatedText,
-          model_usado: selectedModel
+          model_usado: FIXED_MODEL
         }
       ]);
     }
 
-    // --------------------------------------------------------
-    // 5. ENVIAR PARA O FRONT
-    // --------------------------------------------------------
-    res.json({
+    return res.json({
       success: true,
-      model: selectedModel,
+      model: FIXED_MODEL,
       result: generatedText
     });
-  } catch (err) {
-    console.error("❌ ERRO NO /api/generate:", err);
 
-    res.status(500).json({
-      error: "Erro interno ao gerar roteiro.",
-      details: err.message
+  } catch (err) {
+    console.error("❌ ERRO GROQ:", err);
+    return res.status(500).json({
+      error: "Erro interno ao gerar roteiro."
     });
   }
 });
 
 // ------------------------------------------------------------
-// INICIAR SERVIDOR
+// START
 // ------------------------------------------------------------
 app.listen(PORT, () => {
-  console.log(`🔥 Servidor BOOMINUM rodando na porta ${PORT}`);
+  console.log(`🔥 BOOMINUM rodando na porta ${PORT}`);
 });
