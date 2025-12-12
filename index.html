@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>BOOMINUM ⚡ – Gerador de Roteiros</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- STYLE -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- ICON -->
+  <link rel="icon" href="favicon.ico" />
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    BOOMINUM <span>⚡</span>
+  </div>
+
+  <nav class="nav-menu" id="navMenu">
+    <a href="#" id="link-config">Configurações</a>
+    <a href="#" id="link-account">Minha Conta</a>
+  </nav>
+
+  <button class="hamburger" id="hamburgerBtn">☰</button>
+</header>
+
+<main class="container">
+  <div class="card">
+
+    <h1 class="hero">Gerador de Roteiros</h1>
+    <p class="subtitle">Descreva sua ideia e receba um roteiro poderoso</p>
+
+    <div class="controls-grid">
+
+      <!-- MODELOS DO GROQ -->
+      <div class="input-group">
+        <label for="model-select">Modelo de IA</label>
+        <select id="model-select">
+          <option value="llama-3.2-70b-text">LLaMA 3.2 — 70B (Mais inteligente)</option>
+          <option value="llama-3.2-11b-text">LLaMA 3.2 — 11B (Rápido)</option>
+          <option value="mixtral-8x7b-32768">Mixtral 8x7B (Criativo)</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="tone-select">Estilo do roteiro</label>
+        <select id="tone-select">
+          <option value="profissional">Profissional</option>
+          <option value="divertido">Divertido (TikTok)</option>
+          <option value="criativo">Criativo</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="input-group">
+      <label for="prompt-input">Sua ideia</label>
+      <textarea id="prompt-input" placeholder="Digite aqui sua ideia de vídeo, filme ou anúncio..."></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="generate-btn" id="btn-create">Gerar Roteiro</button>
+    </div>
+
+    <h2 class="result-header">Resultado</h2>
+    <div id="output" class="output"></div>
+
+    <div id="creditsInfo" class="credits-info hidden">
+      <span id="creditsRemaining"></span>
+      <small id="creditsReset"></small>
+    </div>
+
+  </div>
+</main>
+
+<!-- ============================ CONFIG ============================ -->
+<div class="modal" id="configModal" aria-hidden="true">
+  <div class="modal-content">
+    <button class="close-btn" id="closeConfig">✕</button>
+
+    <h2 style="text-align:center;">Configurações</h2>
+
+    <div class="section-block">
+      <label>Tema</label>
+      <div class="profile-row">
+        <input type="checkbox" id="setting-darkmode" />
+        <span>Ativar modo escuro</span>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <label>Tamanho da fonte</label>
+      <select id="setting-fontsize">
+        <option value="normal">Normal</option>
+        <option value="small">Pequeno</option>
+        <option value="large">Grande</option>
+      </select>
+    </div>
+
+    <div class="section-block">
+      <label>Modelo padrão</label>
+      <select id="setting-default-model">
+        <option value="llama-3.2-70b-text">LLaMA 3.2 — 70B</option>
+        <option value="llama-3.2-11b-text">LLaMA 3.2 — 11B</option>
+        <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+      </select>
+    </div>
+
+    <div class="actions">
+      <button id="saveSettings" class="generate-btn">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================== MINHA CONTA ========================== -->
+<div class="modal" id="accountModal" aria-hidden="true">
+  <div class="modal-content account-modal">
+    <button class="close-btn" id="closeAccount">✕</button>
+
+    <div class="account-top">
+      <div class="account-avatar" id="avatarInitial">B</div>
+      <div class="account-meta">
+        <div class="account-name" id="account-name">Usuário</div>
+        <div class="account-email" id="account-email"></div>
+      </div>
+    </div>
+
+    <div class="account-tabs">
+      <button class="tab active" data-tab="profile">Perfil</button>
+      <button class="tab" data-tab="security">Segurança</button>
+      <button class="tab" data-tab="subscription">Assinatura</button>
+      <button class="tab" data-tab="auth">Login</button>
+    </div>
+
+    <div class="account-body">
+
+      <!-- PROFILE -->
+      <div id="content-profile" class="tab-content">
+        <div class="section-block">
+          <label>Nome completo</label>
+          <input id="profile-name-input" type="text" />
+          <button id="btn-save-name" class="secondary-btn" style="margin-top:6px;">Salvar nome</button>
+        </div>
+
+        <div class="section-block">
+          <label>Email</label>
+          <input id="profile-email" type="text" disabled class="muted-field" />
+        </div>
+
+        <button id="btn-firebase-logout" class="secondary-btn" style="margin-top:10px;">Sair</button>
+      </div>
+
+      <!-- SECURITY -->
+      <div id="content-security" class="tab-content hidden">
+        <div class="section-block">
+          <label>Email</label>
+          <input id="security-email" type="text" disabled class="muted-field" />
+        </div>
+
+        <div class="section-block">
+          <label>Nova senha</label>
+          <input id="new-password" type="password" />
+        </div>
+
+        <button id="btn-change-password" class="generate-btn">Alterar senha</button>
+      </div>
+
+      <!-- SUBSCRIPTION -->
+      <div id="content-subscription" class="tab-content hidden">
+        <div class="section-block">
+          <label>Plano atual</label>
+          <div id="account-plan" class="muted-field">Free</div>
+        </div>
+
+        <button id="premium-upgrade" class="generate-btn">Fazer upgrade</button>
+      </div>
+
+      <!-- AUTH -->
+      <div id="content-auth" class="tab-content hidden">
+
+        <button id="btn-google-login" class="generate-btn" style="width:100%; margin-bottom:18px;">
+          Entrar com Google
+        </button>
+
+        <div class="section-block">
+          <h3>Entrar com Email</h3>
+          <input id="login-email" type="email" placeholder="Email" /><br><br>
+          <input id="login-password" type="password" placeholder="Senha" /><br><br>
+          <button id="btn-email-login" class="generate-btn">Entrar</button>
+        </div>
+
+        <div class="section-block">
+          <h3>Criar conta</h3>
+          <input id="signup-name" type="text" placeholder="Nome completo" /><br><br>
+          <input id="signup-email" type="email" placeholder="Email" /><br><br>
+          <input id="signup-password" type="password" placeholder="Senha" /><br><br>
+          <button id="btn-email-signup" class="generate-btn">Criar conta</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPT (FINAL) -->
+<script type="module" src="script.js"></script>
+
+</body>
+</html>

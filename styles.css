@@ -1,0 +1,272 @@
+/* ============================================
+   BOOMINUM ⚡ - styles.css (Versão definitiva)
+   Otimizado para modelos GROQ
+============================================ */
+
+/* =========================
+   VARIÁVEIS GLOBAIS (ROOT)
+   ========================= */
+:root {
+  --bg: #f6f8fb;
+  --bg-2: #f1f5f9;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --muted-2: #9aa3b2;
+  --accent: #0466ff;
+  --accent-2: #2aa6ff;
+  --accent-flash: #ffd500;
+  --danger: #ef4444;
+  --success: #10b981;
+  --shadow-1: 0 8px 24px rgba(16,24,40,0.06);
+  --shadow-2: 0 18px 60px rgba(11,14,17,0.06);
+  --radius: 12px;
+  --max-width: 1100px;
+  --text: #0f1724;
+  --overlay: rgba(0,0,0,0.45);
+
+  /* CORES ESPECÍFICAS PARA MODELOS GROQ */
+  --llama70: #4f78ff;
+  --llama11: #5cc9ff;
+  --mixtral: #ff934f;
+
+  /* Badges premium (opcional) */
+  --badge-bg: #eef4ff;
+  --badge-text: #2d3e66;
+}
+
+/* ========================= DARK MODE ========================= */
+body.dark {
+  --bg: #0b0d0f;
+  --bg-2: #0f1113;
+  --card: #0f1113;
+  --muted: #9ca3af;
+  --muted-2: #8b98a6;
+  --accent: #4dabff;
+  --accent-2: #2b7fbf;
+  --text: #e6eef8;
+}
+
+/* ========================= RESET ========================= */
+* { box-sizing: border-box; }
+
+body {
+  margin:0;
+  font-family: Inter, sans-serif;
+  background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+  color: var(--text);
+  min-height:100vh;
+}
+
+.hidden { display:none !important; }
+
+.container {
+  max-width: var(--max-width);
+  margin: 110px auto 40px;
+  padding: 0 20px;
+}
+
+/* ========================= HEADER ========================= */
+header {
+  height: 64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  background: rgba(255,255,255,.66);
+  backdrop-filter: blur(6px);
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:1000;
+  box-shadow: var(--shadow-1);
+}
+
+body.dark header {
+  background: rgba(12,14,18,0.55);
+}
+
+.logo {
+  font-weight:900;
+  letter-spacing:-0.4px;
+  font-size:20px;
+  color:var(--accent);
+}
+
+.logo span {
+  color:var(--accent-flash);
+  font-size:22px;
+}
+
+/* NAV */
+.nav-menu {
+  display:flex;
+  gap:14px;
+}
+.nav-menu a {
+  color:var(--text);
+  font-weight:700;
+  text-decoration:none;
+}
+
+.hamburger {
+  display:none;
+  background:none;
+  border:0;
+  font-size:26px;
+  cursor:pointer;
+}
+
+@media (max-width:768px){
+  .hamburger{ display:block; color:white; }
+  .nav-menu{ display:none; }
+  .nav-menu.active{
+    display:flex;
+    flex-direction:column;
+    position:fixed;
+    top:64px;
+    left:0; right:0;
+    background:#0f1113;
+    padding:20px;
+  }
+}
+
+/* ========================= CARD ========================= */
+.card {
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:36px;
+  box-shadow:var(--shadow-2);
+}
+
+/* HERO */
+.hero {
+  text-align:center;
+  color:var(--accent);
+  font-size:30px;
+  font-weight:800;
+}
+.subtitle {
+  text-align:center;
+  color:var(--muted);
+}
+
+/* ========================= CONTROLS ========================= */
+.controls-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin-top:20px;
+}
+
+/* SELECT MODELS — EFEITO PREMIUM */
+#model-select {
+  border-left:4px solid var(--accent);
+  font-weight:700;
+  background:white;
+  cursor:pointer;
+}
+
+/* cores específicas */
+#model-select option[value="llama-3.2-70b-text"] {
+  color: var(--llama70);
+  font-weight:900;
+}
+#model-select option[value="llama-3.2-11b-text"] {
+  color: var(--llama11);
+  font-weight:800;
+}
+#model-select option[value="mixtral-8x7b-32768"] {
+  color: var(--mixtral);
+  font-weight:900;
+}
+
+.input-group label {
+  font-size:13px;
+  font-weight:700;
+  color:var(--muted-2);
+}
+
+textarea,
+select {
+  width:100%;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid rgba(0,0,0,0.1);
+  background:#fff;
+  font-size:14px;
+}
+
+#prompt-input {
+  min-height:120px;
+  resize:vertical;
+  font-family: ui-monospace, monospace;
+}
+
+/* ========================= BUTTON ========================= */
+.generate-btn {
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  border:0;
+  border-radius:12px;
+  padding:12px 26px;
+  font-size:15px;
+  font-weight:900;
+  color:white;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.generate-btn:hover {
+  opacity:0.88;
+  transform: translateY(-1px);
+}
+
+/* ========================= OUTPUT ========================= */
+.output {
+  margin-top:20px;
+  padding:18px;
+  border-radius:12px;
+  min-height:200px;
+  white-space:pre-wrap;
+  background:#f8fbff;
+  border:1px solid rgba(0,0,0,0.05);
+  font-size:15px;
+  line-height:1.55;
+}
+
+/* ========================= MODAIS ========================= */
+.modal {
+  position:fixed;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  background:var(--overlay);
+  z-index:4000;
+}
+.modal.active { display:flex; }
+
+.modal-content {
+  background:var(--card);
+  border-radius:16px;
+  padding:22px;
+  width:820px;
+  max-width:95%;
+  box-shadow:var(--shadow-2);
+  position:relative;
+}
+
+.close-btn {
+  background:none;
+  border:0;
+  position:absolute;
+  right:18px;
+  top:14px;
+  font-size:20px;
+  cursor:pointer;
+  color:var(--muted);
+}
+
+/* ========================= RESPONSIVE ========================= */
+@media (max-width:768px){
+  .controls-grid { grid-template-columns:1fr; }
+  .modal-content { margin:20px; }
+}
