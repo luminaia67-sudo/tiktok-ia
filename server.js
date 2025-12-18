@@ -45,6 +45,8 @@ app.post("/api/generate", async (req, res) => {
   const { prompt, userId } = req.body;
 
   console.log("📩 REQUEST:", { prompt });
+  console.log("🤖 Usando modelo FIXO:", FIXED_MODEL);
+
 
   try {
     if (!prompt || !prompt.trim()) {
