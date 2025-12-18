@@ -37,19 +37,17 @@
 
       <!-- MODELOS DO GROQ -->
       <div class="input-group">
-        <label for="model-select">Modelo de IA</label>
-        <select id="model-select">
-  <option value="openai/gpt-oss-120b">
-    GPT-OSS 120B — Profissional
-  </option>
-  <option value="openai/gpt-oss-120b">
-    GPT-OSS 120B — Criativo
-  </option>
-  <option value="openai/gpt-oss-120b">
-    GPT-OSS 120B — Rápido
-  </option>
-</select>
-      </div>
+  <label for="model-select">Modelo de IA</label>
+  <select id="model-select" disabled>
+    <option value="llama-3.1-70b-versatile">
+      LLaMA 3.1 — Alta qualidade
+    </option>
+  </select>
+  <small style="opacity:0.6;">
+    Modelo gerenciado automaticamente pelo sistema
+  </small>
+</div>
+
 
       <div class="input-group">
         <label for="tone-select">Estilo do roteiro</label>
