@@ -36,7 +36,7 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
-const FIXED_MODEL = "openai/gpt-oss-120b";
+const FIXED_MODEL = "llama-3.1-70b-versatile";
 
 // ------------------------------------------------------------
 // ROTA PRINCIPAL
