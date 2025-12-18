@@ -24,7 +24,7 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
-const FIXED_MODEL = "llama3-8b-8192";
+const FIXED_MODEL = "llama-3.1-8b-instant";
 
 // ------------------------------------------------------------
 // ROTA PRINCIPAL
